@@ -3,7 +3,7 @@ import time
 import argparse
 import pandas as pd
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 from transformers.cache_utils import DynamicCache
 
 # Import our custom caches
@@ -107,14 +107,19 @@ def evaluate(model, tokenizer, prompt, expected, cache_type="fullkv", config=Non
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
         
+    gen_config = GenerationConfig(
+        max_new_tokens=20,
+        do_sample=False,
+        pad_token_id=tokenizer.eos_token_id,
+        use_cache=True
+    )
+    
     start_t = time.perf_counter()
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
             past_key_values=past_key_values,
-            max_new_tokens=20,
-            pad_token_id=tokenizer.eos_token_id,
-            use_cache=True
+            generation_config=gen_config
         )
     latency = time.perf_counter() - start_t
     
