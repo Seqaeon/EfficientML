@@ -1,0 +1,5 @@
+.ipynb_checkpoints/
+ruler_data/
+.venv/
+__pycache__/
+artifacts/
